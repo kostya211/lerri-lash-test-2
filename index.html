@@ -1,5 +1,370 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест №2 — Безпека роботи</title>
+<style>
+body{
+margin:0;
+font-family:Arial,sans-serif;
 background:
-
-linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)),
-
+linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),
 url('IMG_9043.jpeg');
+background-size:cover;
+background-position:center;
+background-attachment:fixed;
+color:white;
+}
+.container{
+max-width:800px;
+margin:auto;
+padding:20px;
+}
+.card{
+
+background:rgba(30,20,15,.65);
+
+border-radius:25px;
+
+padding:25px;
+
+margin-top:30px;
+
+border:1px solid rgba(255,255,255,.08);
+
+}
+h1,h2,h3{
+text-align:center;
+}
+h1h1{
+
+    font-size:38px;
+
+    text-align:center;
+
+    margin:0 0 15px;
+
+}
+input{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+font-size:16px;
+box-sizing:border-box;
+}
+button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:14px;
+background:#e7c998;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+margin-top:15px;
+}
+.answer{
+display:block;
+padding:12px;
+margin:10px 0;
+background:rgba(255,255,255,.08);
+border-radius:12px;
+cursor:pointer;
+}
+.progress{
+height:12px;
+background:rgba(255,255,255,.15);
+border-radius:20px;
+overflow:hidden;
+margin-bottom:20px;
+}
+.bar{
+height:100%;
+width:0%;
+background:#e7c998;
+}
+.result{
+text-align:center;
+font-size:22px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="card" id="start">
+<h1>Lerri Lashes Academy</h1>
+<h2>📚 Тест №2</h2>
+
+<h3>Безпека роботи</h3>
+<input id="studentName" placeholder="Введіть ім'я та прізвище">
+
+<button onclick="startQuiz()">Почати тест</button>
+
+</div>
+<div class="card" id="quiz" style="display:none">
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+<div id="counter"></div>
+<h3 id="question"></h3>
+<div id="answers"></div>
+</div>
+<div class="card result" id="result" style="display:none"></div>
+</div>
+<script>
+const TOKEN="8926622681:AAEWkNfUYYWIU2M_Nlh_zg2JHhsTn_j5FWI";
+const CHAT_ID="-5426518108";
+const questions = [
+
+["Майстер проводить консультацію перед процедурою. У якій ситуації він має право відмовити клієнту у нарощуванні вій?",
+
+["Клієнт повідомив, що у нього погано тримається нарощування.",
+
+"Клієнт повідомив, що має чутливі очі.",
+
+"Клієнт повідомив, що має легкий тремор повіки.",
+
+"У клієнта спостерігається гостре запалення очей."],3],
+
+["Після процедури майстер помітив залишки клею на пінцеті. Яка перша дія буде правильною?",
+
+["Одразу покласти інструмент у стерилізатор.",
+
+"Видалити залишки клею та підготувати інструмент до дезінфекції.",
+
+"Протерти інструмент спиртом.",
+
+"Промити під проточною водою."],1],
+
+["Під час консультації клієнт повідомив, що має чутливі очі. Як повинен діяти майстер?",
+
+["Одразу відмовити у процедурі.",
+
+"Провести консультацію, пояснити можливі ризики та уважно контролювати стан клієнта під час процедури.",
+
+"Використати більше клею.",
+
+"Використати довші вії."],1],
+
+["Клієнт повідомив, що після минулого нарощування через кілька годин сильно набрякли повіки та з'явився свербіж. Що це може свідчити?",
+
+["Хімічний опік.",
+
+"Алергічна реакція.",
+
+"Неправильно підібраний вигин.",
+
+"Недостатнє знежирення вій."],1],
+
+["Під час процедури клієнт почав скаржитися на печіння та відчуття піску в очах. Найімовірніша причина?",
+
+["Хімічний опік випарами клею.",
+
+"Алергічна реакція.",
+
+"Надто довгі вії.",
+
+"Велика товщина вій."],0],
+
+["Майстер запідозрив алергічну реакцію. Як правильно діяти?",
+
+["Порадити клієнту очні краплі.",
+
+"Запропонувати зняти нарощування та звернутися до лікаря.",
+
+"Почекати добу.",
+
+"Прикласти холодний компрес."],1],
+
+["Майстер помітив, що клієнт не може повністю заплющити очі під час процедури. Як слід вчинити?",
+
+["Продовжити процедуру без змін.",
+
+"Переклеїти патчі.",
+
+"Усунути причину, закрити очі клієнту за допомоги скотчу або приклеюванням пари вій до патча та безпечно продовжити роботу.",
+
+"Попросити клієнта частіше моргати."],2],
+
+["Після процедури клієнт повідомив, що білки очей почервоніли, але повіки не набрякли. Найімовірніше це:",
+
+["Алергія.",
+
+"Хімічний опік.",
+
+"Нормальна реакція.",
+
+"Ознака неправильно підібраного ефекту."],1],
+
+["Яка дія найкраще підвищує довіру клієнта до майстра?",
+
+["Використовувати найдорожчий клей.",
+
+"Відкривати одноразові матеріали безпосередньо перед клієнтом.",
+
+"Використовувати лише чорний скотч.",
+
+"Купувати матеріали одного бренду."],1],
+
+["Під час процедури клієнт почав відчувати сильне печіння в одному оці. Якою повинна бути перша дія майстра?",
+
+["Попросити клієнта потерпіти до завершення процедури.",
+
+"Припинити процедуру та з'ясувати причину дискомфорту.",
+
+"Додати ще одну краплю клею.",
+
+"Заклеїти повіку додатковим скотчем."],1]
+
+];
+let current=0;
+let score=0;
+let mistakes=[]; 
+function startQuiz(){
+const name=document.getElementById("studentName").value.trim();
+if(!name){
+alert("Введіть ім'я та прізвище");
+return;
+}
+document.getElementById("start").style.display="none";
+document.getElementById("quiz").style.display="block";
+showQuestion();
+}
+function showQuestion(){
+const q=questions[current];
+document.getElementById("counter").innerHTML=
+`Питання ${current+1} із ${questions.length}`;
+document.getElementById("question").innerHTML=q[0];
+document.getElementById("bar").style.width=
+((current/questions.length)*100)+"%";
+let html="";
+q[1].forEach((a,i)=>{
+html+=`
+<label class="answer">
+<input type="radio" name="ans" value="${i}">
+${a}
+</label>
+`;
+});
+html+=`<button onclick="nextQuestion()">Далі</button>`;
+document.getElementById("answers").innerHTML=html;
+}
+function nextQuestion(){
+
+const checked=document.querySelector('input[name="ans"]:checked');
+
+if(!checked){
+
+alert("Оберіть відповідь");
+
+return;
+
+}
+
+const userAnswer=Number(checked.value);
+
+const correctAnswer=questions[current][2];
+
+if(userAnswer===correctAnswer){
+
+score++;
+
+}else{
+
+mistakes.push({
+
+question: questions[current][0],
+
+user: questions[current][1][userAnswer],
+
+correct: questions[current][1][correctAnswer]
+
+});
+
+}
+
+current++;
+
+if(current>=questions.length){
+
+finishQuiz();
+
+}else{
+
+showQuestion();
+
+}
+
+}
+
+async function finishQuiz(){
+document.getElementById("quiz").style.display="none";
+const percent=Math.round(score/questions.length*100);
+const passed=score>=8;
+document.getElementById("result").style.display="block";
+document.getElementById("result").innerHTML=
+passed
+?
+`🎉 <h2>Тест успішно складено</h2>
+<h3>${score}/10 (${percent}%)</h3>`
+:
+`❌ <h2>Тест не складено</h2>
+<h3>${score}/10 (${percent}%)</h3>
+<p>Необхідно мінімум 8 правильних відповідей</p>`;
+let text=
+
+`📚 Тест №2. Безпека роботи
+
+👤 Учениця: ${document.getElementById("studentName").value}
+
+🏆 Результат: ${score}/10
+
+📊 ${percent}%
+
+${passed ? "✅ Тест складено" : "❌ Тест НЕ складено"}
+
+`;
+
+if(mistakes.length){
+
+text += "\n\n❌ Помилки:\n\n";
+
+mistakes.forEach((m,index)=>{
+
+text +=
+
+`${index+1}️⃣ ${m.question}
+
+❌ Відповідь учениці:
+
+${m.user}
+
+✅ Правильна відповідь:
+
+${m.correct}
+
+━━━━━━━━━━━━━━
+
+`;
+
+});
+
+}
+try{
+await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+chat_id:CHAT_ID,
+text:text
+})
+});
+}catch(e){}
+}
+</script>
+</body>
+</html>
